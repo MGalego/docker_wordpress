@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  mysql:
+    build: ./bin/mysql
+    container_name: "${CONTAINER_NAME}_mysql"
+    restart: 'always'
+    volumes: 
+      - ./data/mysql:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: "${CONTAINER_NAME}_phpmyadmin"
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - ${REMOTE_IP}:${PHPMYADMIN_PORT}:80
+    volumes:
+      - ./data/phpmyadmin/session:/sessions
+
+networks:
+    default:
+       external:
+         name: ${NETWORK}
